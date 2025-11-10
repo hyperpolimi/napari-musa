@@ -33,6 +33,20 @@ dependencies = [
     "magicgui",
     "qtpy",
     "scikit-image",
+    "scikit-learn",
+    "h5py",
+    "bokeh",
+    "plotly",
+    "PyWavelets",
+    "scipy",
+    "pyqtgraph",
+    "qtawesome",
+    "matplotlib",
+    "umap-learn",
+    "spectral",
+    "pybaselines",
+    "pysptools",
+    "pillow",
 ]
 
 [project.optional-dependencies]
