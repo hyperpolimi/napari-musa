@@ -188,7 +188,7 @@ class NMF(QWidget):
         self.viewer.add_image(
             self.data.nmf_maps[mode].transpose(2, 0, 1),
             name=str(mode) + " - NMF",
-            # ={"type": "hyperspectral_cube"},
+            metadata={"type": "abundances_cube"},
         )
 
         show_info("NMF analysis completed!")

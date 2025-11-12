@@ -427,6 +427,7 @@ class DataManager(QWidget):  # From QWidget
             "masked_hsi_cube",
         ]
         rgb_types = ["rgb", "reduced_rgb", "masked_rgb", "false_rgb"]
+        abundances_types = ["abundances_cube"]
         if (
             selected_layer
             and selected_layer.metadata.get("type") in cube_types
@@ -494,6 +495,43 @@ class DataManager(QWidget):  # From QWidget
                 ).astype("uint8")
             rgb_image = Image.fromarray(rgb_data[..., :3])
             rgb_image.save(filename)
+
+        # ABUNDANCES
+        elif (
+            selected_layer
+            and selected_layer.metadata.get("type") in abundances_types
+        ):
+            save_dict = {
+                "data": selected_layer.data.transpose(1, 2, 0),
+            }
+            filename, _ = QFileDialog.getSaveFileName(
+                self,
+                "Save selected dataset",
+                "",
+                "MATLAB file (*.mat);;HDF5 file (*.h5)",
+            )
+            savemat(filename, save_dict)
+
+            if not filename:
+                return  # the user has canceled the save dialog
+
+            ext = splitext(filename)[1].lower()
+            if ext == "":
+                if _.startswith("MATLAB"):
+                    filename += ".mat"
+                    ext = ".mat"
+                elif _.startswith("HDF5"):
+                    filename += ".h5"
+                    ext = ".h5"
+
+            if ext == ".mat":
+                savemat(filename, save_dict)
+            elif ext == ".h5":
+                with h5py.File(filename, "w") as f:
+                    f.create_dataset(
+                        "data", data=self.data.hypercubes[data_mode]
+                    )
+                    f.create_dataset("WL", data=self.data.wls[data_mode])
 
         # LABEL LAYER
         elif isinstance(selected_layer, napari.layers.Labels):

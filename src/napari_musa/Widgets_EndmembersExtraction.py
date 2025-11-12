@@ -332,7 +332,7 @@ class EndmembersExtraction(QWidget):
         self.viewer.add_image(
             self.data.nnls_maps[mode].transpose(2, 0, 1),
             name=str(mode) + " - NNLS",
-            # ={"type": "hyperspectral_cube"},
+            metadata={"type": "abundances_cube"},
         )
 
     def run_sam(self):
@@ -368,7 +368,7 @@ class EndmembersExtraction(QWidget):
             + " - SAM with angle "
             + str(self.angle_spinbox.value),
             colormap="gray_r",
-            # ={"type": "hyperspectral_cube"},
+            metadata={"type": "abundances_cube"},
         )
 
     # %%
