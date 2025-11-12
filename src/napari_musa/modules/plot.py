@@ -25,7 +25,7 @@ class Plot(QWidget):
         self.poly_roi = None
         self.drawing = False
         self.vertical_line = None
-        self.mouse_connected = False
+        self._mouse_connected = False
 
     def setup_plot(self, plot, fused=False):
         self.ax = self.ax2 = self.ax3 = None  # Reset of the axis
@@ -327,13 +327,13 @@ class Plot(QWidget):
 
     ## ICONS
     def polygon_selection(self, plot):
-        """Polygonal selection on scatterplot"""
         self.plot = plot
         self.temp_points = []
-        # Remove old ROIs
+
+        # rimuovi ROI precedente
         if self.poly_roi:
-            # Disconnect if necessary
-            if self.mouse_connected:
+            # disconnetti se necessario
+            if self._mouse_connected:
                 with suppress(TypeError):
                     self.plot.scene().sigMouseClicked.disconnect(
                         self.add_point_to_polygon
@@ -344,22 +344,22 @@ class Plot(QWidget):
                 #    )
                 # except TypeError:
                 #    pass
+
+                self._mouse_connected = False
             self.plot.removeItem(self.poly_roi)
 
         self.poly_roi = pg.PolyLineROI(
-            [],
-            closed=False,
-            pen="r",
-            handlePen=pg.mkPen("red"),
+            [], closed=False, pen="r", handlePen=pg.mkPen("red")
         )
         self.plot.addItem(self.poly_roi)
+
         self.drawing = True
-        # connect
-        if not self.mouse_connected:
+        # collega in modo idempotente
+        if not self._mouse_connected:
             self.plot.scene().sigMouseClicked.connect(
                 self.add_point_to_polygon
             )
-            self.mouse_connected = True
+            self._mouse_connected = True
 
     def add_point_to_polygon(self, event):
         """Add points to the ROI"""
@@ -373,10 +373,8 @@ class Plot(QWidget):
             if event.double():
                 self.drawing = False
                 self.poly_roi.closed = True
-                self.poly_roi.setPoints(
-                    self.temp_points
-                )  # richiude visivamente
-                if self.mouse_connected:
+                self.poly_roi.setPoints(self.temp_points)
+                if self._mouse_connected:
                     with suppress(TypeError):
                         self.plot.scene().sigMouseClicked.disconnect(
                             self.add_point_to_polygon
@@ -386,8 +384,17 @@ class Plot(QWidget):
                     #        self.add_point_to_polygon
                     #    )
                     # except TypeError:
-                    #    pass
-                    # self.mouse_connected = False
+                    self._mouse_connected = False
+
+        # Aggiunta punti (singolo click)
+        pos = event.scenePos()
+        vb = self.plot.getViewBox()
+        if vb is None:
+            return
+        data_pos = vb.mapSceneToView(pos)
+        self.temp_points.append([data_pos.x(), data_pos.y()])
+        if self.poly_roi:
+            self.poly_roi.setPoints(self.temp_points)
 
     def show_selected_points(self, scatterdata, hsi_image, mode, points):
         """ """

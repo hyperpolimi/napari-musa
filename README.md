@@ -9,7 +9,15 @@
 [![npe2](https://img.shields.io/badge/plugin-npe2-blue?link=https://napari.org/stable/plugins/index.html)](https://napari.org/stable/plugins/index.html)
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-purple.json)](https://github.com/copier-org/copier)
 
-A Napari plugin to perform analysis on Hyperspectral Imaging datasets
+A Napari plugin to perform analysis on Hyperspectral Imaging datasets.
+
+The 'Data Manager' widget opens, processes and manipulates the datasets.
+The 'Data Visualization' widget visualize the mean spectra and perform True and False RGBs.
+The 'Fusion' widget fused two or three opened datasets.
+The 'UMAP' widget perform and visualize the Uniform Manifold Approximation and Projection analysis.
+The 'PCA' widget perform and visualize the Principal Component Analysis.
+The 'NMF' widget perform and visualize the Non-Negative Matrix Factorization analysis.
+The 'Endmembers' widget perform Endmembers extraction (through SiVM, VCA) and visualize the maps (through NNLS, SAM).
 
 ----------------------------------
 
@@ -44,6 +52,8 @@ To install latest development version :
 pip install git+https://github.com/hyperpolimi/napari-musa.git
 ```
 
+## Usage
+A detailed guide which shows how to use the plugin and how to properly choose the parameters can be found [here].
 
 
 ## Contributing
@@ -77,3 +87,6 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [tox]: https://tox.readthedocs.io/en/latest/
 [pip]: https://pypi.org/project/pip/
 [PyPI]: https://pypi.org/
+
+
+[here]:  https://github.com/alessiadb/napari-hsi-analysis/blob/main/docs/guide.md
