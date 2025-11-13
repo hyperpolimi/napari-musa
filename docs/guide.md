@@ -1,6 +1,6 @@
 # napari-musa
 
-Mltimodal fUsion framework for Spectral Analysis (MUSA) is a Napari plugin designed for the analysis of hyperspectral imaging datasets. It allows for data visualization and processing, fusion of registered datasets from different techniques and employement of various dimensionality reduction algorithms.
+**M**ultimodal f**U**sion framework for **S**pectral **A**nalysis (MUSA) is a Napari plugin designed for the analysis of hyperspectral imaging datasets. It allows for data visualization and processing, fusion of registered datasets from different techniques and employement of various dimensionality reduction algorithms.
 The plugin features seven main tabs: **Data Manager**, **Data Visualization**, **Fusion**, **UMAP**, **PCA**, **NMF** and **Endmembers extraction**.
 
 ## Data Manager widget
