@@ -20,18 +20,24 @@ If a variable name is not present in the lists before, the program will ask for 
 **Contrast Adjustment**: Use the *layer controls* tab. Click once for single image contrast, or continuous for automatic adjustment across the hypercube.
 
 ### Data Manager features
-- **Preprocessing**: Offers 2D median, 2D Gaussian and Savitzky-Golay filters. Select desired options, adjust parameters, click *Process data*, and wait for the confirmation message.
+- **Save box**: This command will save the selected layer. Specifically, Hypercubes and abundances maps (NMF, NNLS, SAM) can be saved in .mat and .h5, while True/False RGB and labesls layers will be saved as .png or .jpeg.
+- **Crop box**: Crop the datasets both spatially and spectrally.
+- **Mask box**: Create a mask from the data, starting from a selected label layer.
+- **Data cleaning box**: Offers 2D median, 2D Gaussian and Savitzky-Golay filters. Select desired options, adjust parameters, click *Process data*, and wait for the confirmation message.
 It also offers SVD denoising and background subtraction through SNIP algorithm.
 - **Create Derivative**: Computes the spectral derivative hypercube. Recommended after preprocessing.
 - **Dimensionality reduction**: Supports spatial and spectral reduction via Discrete Wavelet Transform (DWT). Select reduction type(s) and click *Reduce data*.
 
-### Cropping the hypercube
+### Spatially cropping the hypercube
 1. Select the *Shapes* layer.
 2. Use a rectangle tool (**only rectangular shapes are supported**).
 3. Click *Crop*.
 4. (Optional) Delete the original layer.
 **TIP**: Keep the cropping *Shapes* layer if fusing multiple datasets and reuse the same shape on a second registered dataset for identical cropping.
 
+### Spectrally cropping the hypercube
+1. Insert the minimum and maximum channels you want to keep (they can be found on bottom right).
+2. Click *Crop wavelengths*.
 
 ### Create a mask
 1. Select the *Labels* layer.
@@ -83,6 +89,13 @@ The Fusion widget combines two or three opened datasets.
 
 To select areas, use polygon selection and draw the region (double-click to close). Click the add button to finalize.
 The selection creates a label layer usable for spectrum plotting or mask creation.
+
+### Additional features
+**Show UMAP scatterplot in True RGB**: It is possible to show the scatterplot as true RGB. Tick the *Scatterplot with the True RGB* checkbox and press again *Show UMAP scatterplot*.
+
+**Change Dimension of scatterpoint**: It is possible to change the dimension of the points within the scatterplot. Select the *Point size* and press again *Show UMAP scatterplot*.
+
+**Select an area in the image and visualize the points in the UMAP scatterplot**: It is also possible to select an area on the image (through the label layer) and then check in which area of the scatterplot it is located, by pushing the button *Show areas of Label Layer on scatterplot*.
 
 
 ## Example - Mask from fused dataset

@@ -106,7 +106,11 @@ class EndmembersExtraction(QWidget):
 
         row2 = QHBoxLayout()
         self.modes_vertex_analysis = ComboBox(
-            choices=["SiVM", "VCA", "N-FINDR", "PPI"],
+            choices=[
+                "SiVM",
+                "VCA",
+                # "N-FINDR", "PPI (slow)"
+            ],
             label="Select the endmembers extraction mode",
         )
         run_btn = PushButton(text="Run endmember analysis")
