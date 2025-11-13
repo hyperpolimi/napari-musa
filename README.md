@@ -19,6 +19,9 @@ The 'PCA' widget perform and visualize the Principal Component Analysis.
 The 'NMF' widget perform and visualize the Non-Negative Matrix Factorization analysis.
 The 'Endmembers' widget perform Endmembers extraction (through SiVM, VCA) and visualize the maps (through NNLS, SAM).
 
+## Usage
+A detailed guide which shows how to use the plugin and how to properly choose the parameters can be found [here].
+
 ----------------------------------
 
 This [napari] plugin was generated with [copier] using the [napari-plugin-template] (None).
@@ -52,8 +55,7 @@ To install latest development version :
 pip install git+https://github.com/hyperpolimi/napari-musa.git
 ```
 
-## Usage
-A detailed guide which shows how to use the plugin and how to properly choose the parameters can be found [here].
+
 
 
 ## Contributing
@@ -89,4 +91,4 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [PyPI]: https://pypi.org/
 
 
-[here]:  https://github.com/alessiadb/napari-musa/blob/main/docs/guide.md
+[here]:  https://github.com/hyperpolimi/napari-musa/blob/main/docs/guide.md
