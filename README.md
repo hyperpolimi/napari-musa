@@ -89,4 +89,4 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [PyPI]: https://pypi.org/
 
 
-[here]:  https://github.com/alessiadb/napari-hsi-analysis/blob/main/docs/guide.md
+[here]:  https://github.com/alessiadb/napari-musa/blob/main/docs/guide.md
