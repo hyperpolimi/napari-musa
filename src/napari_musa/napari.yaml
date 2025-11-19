@@ -11,5 +11,5 @@ contributions:
       title: RUN
 
   widgets:
-    - command: napari-musa.run_app
+    - command: napari-musa.run_app(self)
       display_name: MUSA - HSI Analysis
