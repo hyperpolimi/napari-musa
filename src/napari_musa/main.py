@@ -15,12 +15,12 @@ from napari_musa.Widgets_PCA import PCA
 from napari_musa.Widgets_UMAP import UMAP
 
 
-def setup_connections(self):
+def setup_connections(self, viewer):
     """ """
-    self.viewer.text_overlay.visible = True
+    viewer.text_overlay.visible = True
 
     def on_step_change(event=None):
-        layer = self.viewer.layers.selection.active
+        layer = viewer.layers.selection.active
         if layer and isinstance(layer, napari.layers.Image):
             name = layer.name
             if "NNLS" in name or "SAM" in name:
@@ -33,26 +33,26 @@ def setup_connections(self):
                 self.datamanager_widget.update_wl()
 
     # collega la funzione wrapper
-    self.viewer.dims.events.current_step.connect(on_step_change)
+    viewer.dims.events.current_step.connect(on_step_change)
 
     # resto invariato
-    self.viewer.layers.selection.events.active.connect(
+    viewer.layers.selection.events.active.connect(
         self.datamanager_widget.layer_auto_selection
     )
 
 
-def on_new_layer(self, event):
+def on_new_layer(self, event, viewer):
     layer = event.value
     if (
         isinstance(layer, napari.layers.Labels) and layer.data.ndim == 3
     ):  # (C, Y, X)
 
         def replace():
-            if layer in self.viewer.layers:  # solo se esiste ancora
+            if layer in viewer.layers:  # solo se esiste ancora
                 new_labels = np.zeros(layer.data.shape[1:], dtype=np.int32)
                 name = layer.name
-                self.viewer.layers.remove(layer)
-                self.viewer.add_labels(new_labels, name=name)
+                viewer.layers.remove(layer)
+                viewer.add_labels(new_labels, name=name)
 
         QTimer.singleShot(0, replace)
 
@@ -79,72 +79,73 @@ def update_modes_comboboxes(self):
                     widget.modes_combobox.value = current_value
 
 
-def run_napari_app(self):
+def run_napari_app():
     """Add widgets to the viewer"""
     try:
-        self.viewer = napari.current_viewer()
+        viewer = napari.current_viewer()
     except AttributeError:
-        self.viewer = napari.Viewer()
+        viewer = napari.Viewer()
 
     # WIDGETS
     data = Data()
-    plot_datavisualization = Plot(viewer=self.viewer, data=data)
-    datamanager_widget = DataManager(self.viewer, data)
+    plot_datavisualization = Plot(viewer=viewer, data=data)
+    datamanager_widget = DataManager(viewer, data)
     datavisualization_widget = DataVisualization(
-        self.viewer, data, plot_datavisualization, datamanager_widget
+        viewer, data, plot_datavisualization, datamanager_widget
     )
-    fusion_widget = Fusion(self.viewer, data)
+    fusion_widget = Fusion(viewer, data)
 
-    plot_umap = Plot(viewer=self.viewer, data=data)
-    umap_widget = UMAP(self.viewer, data, plot_umap)
-    nmf_widget = NMF(self.viewer, data, plot_umap)
-    endmextr_widget = EndmembersExtraction(self.viewer, data, plot_umap)
-    plot_pca = Plot(viewer=self.viewer, data=data)
-    pca_widget = PCA(self.viewer, data, plot_pca)
+    plot_umap = Plot(viewer=viewer, data=data)
+    umap_widget = UMAP(viewer, data, plot_umap)
+    nmf_widget = NMF(viewer, data, plot_umap)
+    endmextr_widget = EndmembersExtraction(viewer, data, plot_umap)
+    plot_pca = Plot(viewer=viewer, data=data)
+    pca_widget = PCA(viewer, data, plot_pca)
 
     datamanager_widget.mode_added.connect(update_modes_comboboxes)
 
     # Add widget as dock
-    datamanager_dock = self.viewer.window.add_dock_widget(
+    datamanager_dock = viewer.window.add_dock_widget(
         datamanager_widget, name="Data Manager", area="right"
     )
-    datavisualization_dock = self.viewer.window.add_dock_widget(
+    datavisualization_dock = viewer.window.add_dock_widget(
         datavisualization_widget, name="Data Visualization", area="right"
     )
-    fusion_dock = self.viewer.window.add_dock_widget(
+    fusion_dock = viewer.window.add_dock_widget(
         fusion_widget, name="Fusion", area="right"
     )
-    umap_dock = self.viewer.window.add_dock_widget(
+    umap_dock = viewer.window.add_dock_widget(
         umap_widget, name="UMAP", area="right"
     )
-    endmextr_dock = self.viewer.window.add_dock_widget(
+    endmextr_dock = viewer.window.add_dock_widget(
         endmextr_widget, name="Endmembers", area="right"
     )
-    pca_dock = self.viewer.window.add_dock_widget(
+    pca_dock = viewer.window.add_dock_widget(
         pca_widget, name="PCA", area="right"
     )
-    nmf_dock = self.viewer.window.add_dock_widget(
+    nmf_dock = viewer.window.add_dock_widget(
         nmf_widget, name="NMF", area="right"
     )
 
     # Tabify the widgets
-    self.viewer.window._qt_window.tabifyDockWidget(
+    viewer.window._qt_window.tabifyDockWidget(
         datamanager_dock, datavisualization_dock
     )
-    self.viewer.window._qt_window.tabifyDockWidget(
+    viewer.window._qt_window.tabifyDockWidget(
         datavisualization_dock, fusion_dock
     )
-    self.viewer.window._qt_window.tabifyDockWidget(fusion_dock, umap_dock)
-    self.viewer.window._qt_window.tabifyDockWidget(umap_dock, pca_dock)
-    self.viewer.window._qt_window.tabifyDockWidget(pca_dock, endmextr_dock)
-    self.viewer.window._qt_window.tabifyDockWidget(endmextr_dock, nmf_dock)
+    viewer.window._qt_window.tabifyDockWidget(fusion_dock, umap_dock)
+    viewer.window._qt_window.tabifyDockWidget(umap_dock, pca_dock)
+    viewer.window._qt_window.tabifyDockWidget(pca_dock, endmextr_dock)
+    viewer.window._qt_window.tabifyDockWidget(endmextr_dock, nmf_dock)
     # Text overlay in the viewer
-    self.viewer.text_overlay.visible = True
+    viewer.text_overlay.visible = True
 
-    setup_connections()
-    self.viewer.layers.events.inserted.connect(on_new_layer)
-    self.viewer.layers.selection.events.active.connect(
-        datamanager_widget.on_layer_selected
-    )
+    setup_connections(viewer)
+    viewer.layers.events.inserted.connect(on_new_layer(viewer))
+
+    # viewer.layers.selection.events.active.connect(
+    #    datamanager_widget.on_layer_selected
+    # )
 
     return None  # Non serve restituire nulla

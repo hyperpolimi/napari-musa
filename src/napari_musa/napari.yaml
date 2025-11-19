@@ -7,7 +7,7 @@ categories: ["Annotation", "Segmentation", "Acquisition"]
 contributions:
   commands:
     - id: napari-musa.run_app
-      python_name: napari_musa.main:run_napari_app(self)
+      python_name: napari_musa.main:run_napari_app
       title: RUN
 
   widgets:
