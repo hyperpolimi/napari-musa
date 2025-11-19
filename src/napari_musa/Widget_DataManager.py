@@ -341,7 +341,7 @@ class DataManager(QWidget):  # From QWidget
             min=1, max=100, value=11, step=2, name="Window"
         )
         self.savgolp_spinbox = SpinBox(
-            min=1, max=100, value=3, step=2, name="Polynom"
+            min=1, max=100, value=3, step=2, name="Polynomial"
         )
         savgol_layout.addWidget(
             Container(widgets=[self.savgol_checkbox]).native

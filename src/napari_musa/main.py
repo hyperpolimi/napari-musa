@@ -15,12 +15,12 @@ from napari_musa.Widgets_PCA import PCA
 from napari_musa.Widgets_UMAP import UMAP
 
 
-def setup_connections(self):
+def setup_connections(self, viewer):
     """ """
-    self.viewer.text_overlay.visible = True
+    viewer.text_overlay.visible = True
 
     def on_step_change(event=None):
-        layer = self.viewer.layers.selection.active
+        layer = viewer.layers.selection.active
         if layer and isinstance(layer, napari.layers.Image):
             name = layer.name
             if "NNLS" in name or "SAM" in name:
@@ -33,10 +33,10 @@ def setup_connections(self):
                 self.datamanager_widget.update_wl()
 
     # collega la funzione wrapper
-    self.viewer.dims.events.current_step.connect(on_step_change)
+    viewer.dims.events.current_step.connect(on_step_change)
 
     # resto invariato
-    self.viewer.layers.selection.events.active.connect(
+    viewer.layers.selection.events.active.connect(
         self.datamanager_widget.layer_auto_selection
     )
 
@@ -141,7 +141,7 @@ def run_napari_app():
     # Text overlay in the viewer
     viewer.text_overlay.visible = True
 
-    setup_connections()
+    setup_connections(viewer)
     viewer.layers.events.inserted.connect(on_new_layer)
     viewer.layers.selection.events.active.connect(
         datamanager_widget.on_layer_selected
