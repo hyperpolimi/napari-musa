@@ -1,7 +1,5 @@
-""" """
-
 import napari
-import napari as np
+import numpy as np  # <--- QUI era sbagliato prima
 from qtpy.QtCore import QTimer
 
 from napari_musa.modules.data import Data
@@ -15,8 +13,10 @@ from napari_musa.Widgets_PCA import PCA
 from napari_musa.Widgets_UMAP import UMAP
 
 
-def setup_connections(self, viewer):
-    """ """
+def setup_connections(
+    viewer, datamanager_widget, endmextr_widget, nmf_widget, pca_widget
+):
+    """"""
     viewer.text_overlay.visible = True
 
     def on_step_change(event=None):
@@ -24,59 +24,77 @@ def setup_connections(self, viewer):
         if layer and isinstance(layer, napari.layers.Image):
             name = layer.name
             if "NNLS" in name or "SAM" in name:
-                self.endmextr_widget.update_number_H()
+                endmextr_widget.update_number_H()
             elif "NMF" in name:
-                self.nmf_widget.update_number_H()
+                nmf_widget.update_number_H()
             elif "PCA" in name:
-                self.pca_widget.update_number_H()
+                pca_widget.update_number_H()
             else:
-                self.datamanager_widget.update_wl()
+                datamanager_widget.update_wl()
 
-    # collega la funzione wrapper
     viewer.dims.events.current_step.connect(on_step_change)
 
-    # resto invariato
     viewer.layers.selection.events.active.connect(
-        self.datamanager_widget.layer_auto_selection
+        datamanager_widget.layer_auto_selection
     )
 
 
-def on_new_layer(self, event, viewer):
-    layer = event.value
-    if (
-        isinstance(layer, napari.layers.Labels) and layer.data.ndim == 3
-    ):  # (C, Y, X)
+def make_on_new_layer(viewer):
+    """Factory per il callback, così ha accesso a `viewer` via closure."""
 
-        def replace():
-            if layer in viewer.layers:  # solo se esiste ancora
-                new_labels = np.zeros(layer.data.shape[1:], dtype=np.int32)
-                name = layer.name
-                viewer.layers.remove(layer)
-                viewer.add_labels(new_labels, name=name)
+    def on_new_layer(event):
+        layer = event.value
+        if (
+            isinstance(layer, napari.layers.Labels) and layer.data.ndim == 3
+        ):  # (C, Y, X)
 
-        QTimer.singleShot(0, replace)
+            def replace():
+                if layer in viewer.layers:  # solo se esiste ancora
+                    new_labels = np.zeros(layer.data.shape[1:], dtype=np.int32)
+                    name = layer.name
+                    viewer.layers.remove(layer)
+                    viewer.add_labels(new_labels, name=name)
+
+            QTimer.singleShot(0, replace)
+
+    return on_new_layer
 
 
-def update_modes_comboboxes(self):
-    for widget in [
-        self.datamanager_widget,
-        self.umap_widget,
-        self.fusion_widget,
-        self.endmextr_widget,
-        self.pca_widget,
-        self.nmf_widget,
-    ]:
-        for attr_name in dir(widget):
-            if attr_name.startswith("modes_combobox"):
-                if widget == self.fusion_widget:
-                    widget.modes_combobox_1.choices = self.data.modes
-                    widget.modes_combobox_2.choices = self.data.modes
-                    widget.modes_combobox_3.choices = self.data.modes
-                else:
-                    current_value = widget.modes_combobox.value
-                    widget.modes_combobox.choices = self.data.modes
-                if current_value not in self.data.modes:
-                    widget.modes_combobox.value = current_value
+def make_update_modes_comboboxes(
+    data,
+    datamanager_widget,
+    umap_widget,
+    fusion_widget,
+    endmextr_widget,
+    pca_widget,
+    nmf_widget,
+):
+    """Factory per aggiornare tutte le combobox dei 'modes'."""
+
+    widgets = [
+        datamanager_widget,
+        umap_widget,
+        fusion_widget,
+        endmextr_widget,
+        pca_widget,
+        nmf_widget,
+    ]
+
+    def update_modes_comboboxes(*_):
+        for widget in widgets:
+            for attr_name in dir(widget):
+                if attr_name.startswith("modes_combobox"):
+                    if widget == fusion_widget:
+                        widget.modes_combobox_1.choices = data.modes
+                        widget.modes_combobox_2.choices = data.modes
+                        widget.modes_combobox_3.choices = data.modes
+                    else:
+                        current_value = widget.modes_combobox.value
+                        widget.modes_combobox.choices = data.modes
+                        if current_value not in data.modes:
+                            widget.modes_combobox.value = current_value
+
+    return update_modes_comboboxes
 
 
 def run_napari_app():
@@ -102,6 +120,15 @@ def run_napari_app():
     plot_pca = Plot(viewer=viewer, data=data)
     pca_widget = PCA(viewer, data, plot_pca)
 
+    update_modes_comboboxes = make_update_modes_comboboxes(
+        data,
+        datamanager_widget,
+        umap_widget,
+        fusion_widget,
+        endmextr_widget,
+        pca_widget,
+        nmf_widget,
+    )
     datamanager_widget.mode_added.connect(update_modes_comboboxes)
 
     # Add widget as dock
@@ -138,14 +165,17 @@ def run_napari_app():
     viewer.window._qt_window.tabifyDockWidget(umap_dock, pca_dock)
     viewer.window._qt_window.tabifyDockWidget(pca_dock, endmextr_dock)
     viewer.window._qt_window.tabifyDockWidget(endmextr_dock, nmf_dock)
+
     # Text overlay in the viewer
     viewer.text_overlay.visible = True
 
-    setup_connections(viewer)
-    viewer.layers.events.inserted.connect(on_new_layer(viewer))
+    # Connections
+    setup_connections(
+        viewer, datamanager_widget, endmextr_widget, nmf_widget, pca_widget
+    )
+    viewer.layers.events.inserted.connect(make_on_new_layer(viewer))
+    viewer.layers.selection.events.active.connect(
+        datamanager_widget.on_layer_selected
+    )
 
-    # viewer.layers.selection.events.active.connect(
-    #    datamanager_widget.on_layer_selected
-    # )
-
-    return None  # Non serve restituire nulla
+    return None
