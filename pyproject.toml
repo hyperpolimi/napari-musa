@@ -84,6 +84,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml"]
+"napari_musa.modules" = ["*.mat"]
 
 [tool.setuptools_scm]
 write_to = "src/napari_musa/_version.py"
